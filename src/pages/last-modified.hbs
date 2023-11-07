@@ -1,0 +1,51 @@
+<div>
+  <table>
+    <tr>
+      <td>
+        Data:
+      </td>
+      <td>
+        <strong>{{time}}</strong>
+      </td>
+    </tr>
+  </table>
+  <p>
+    此演示利用 <code>Last-Modified</code> 响应头来验证服务器响应的新鲜度。与 <code>ETag</code> 类似，第一次访问此页面时，浏览器会收到来自服务器的完整响应。
+    该响应包括 <code>Last-modified</code> 标头，其中包含生成响应的日期。这应该与上面显示的时间戳一致。
+  </p>
+  <p>
+    <img
+      width="927"
+      height="281"
+      src="https://blog-1318409910.cos.ap-beijing.myqcloud.com/blog/20231107201031.png"
+      alt="Screenshot of Chrome DevTools showing response headers, including 'last-modified: Wed, 09 Nov 2022 13:37:00 GMT'."
+    />
+  </p>
+  <p>
+   浏览器将存储接收到的最后修改日期，并使用 <code>if-modified-since</code> 标头将其包含在以后的每次请求中。
+   如果数据早于 <code>if-modified-since</code> 值，服务器将以 <code>304</code> 状态代码响应，浏览器可重新使用缓存数据。
+  </p>
+  {{! prettier-ignore }}
+  <p>
+    <details>
+      <summary>View Source Code</summary>
+      <pre><code>if (time &lt;= request.headers["if-modified-since"]) {
+  reply.statusCode = 304;
+  reply.send();
+} else {
+  reply.headers({
+    "cache-control": "no-cache",
+    "last-modified": time,
+  });
+  reply.view("/src/pages/last-modified.hbs", params);
+}
+
+return reply;</code></pre>
+    </details>
+  </p>
+  <hr />
+  <details>
+    <summary>Lorem ipsum</summary>
+    {{{data}}}
+  </details>
+</div>

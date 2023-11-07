@@ -1,0 +1,43 @@
+<div>
+  <table>
+    <tr>
+      <td>
+        Data:
+      </td>
+      <td>
+        <strong>{{time}}</strong>
+      </td>
+    </tr>
+  </table>
+  <p>
+    该页面返回
+    <code> cache-control: no-store</code>
+  </p>
+  <p>
+  本页面返回一个 cache-control: no-store 响应头。这指示浏览器不缓存响应。
+
+上面的时间戳由服务器生成，显示服务器响应的新鲜度。该值每 60 秒更新一次。如果您刷新页面，而 60 秒已经过去，该值就会更新为最新的服务器时间。在整个演示中，它将用于显示服务器响应是过时还是新鲜。在您的网站上，这可能是服务器从 CMS 或 API 获取的数据。
+
+请注意，下面水平规则下方的 "Lorem ipsum "虚假文本仅用于夸大服务器响应的大小，可以忽略。
+  </p>
+  <p>
+    <img
+      width="456"
+      height="116"
+      src="https://blog-1318409910.cos.ap-beijing.myqcloud.com/blog/20231107200518.png"
+      alt="Screenshot of Chrome DevTools showing response headers, including 'cache-control: no-store'."
+    />
+  </p>
+  {{! prettier-ignore }}
+  <p>
+    <details>
+      <summary>View Source Code</summary>
+      <pre><code>reply.headers({ "cache-control": "no-store" });</code></pre>
+    </details>
+  </p>
+  <hr />
+  <details>
+    <summary>Lorem ipsum</summary>
+    {{{data}}}
+  </details>
+</div>

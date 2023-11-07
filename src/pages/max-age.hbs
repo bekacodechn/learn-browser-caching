@@ -1,0 +1,70 @@
+<div>
+  <table>
+    <tr>
+      <td>
+        Data:
+      </td>
+      <td>
+        <strong>{{time}}</strong>
+      </td>
+    </tr>
+  </table>
+  <p>
+    <code>max-age=N</code> 指令指示浏览器可以将资源缓存 <code>N</code> 秒，并在后续请求中重复使用，而无需重新验证。
+  </p>
+  <p>
+    <img
+      width="927"
+      height="281"
+      src="https://blog-1318409910.cos.ap-beijing.myqcloud.com/blog/20231107201557.png"
+      alt="Screenshot of Chrome DevTools showing response headers, including 'cache-control: max-age=30'."
+    />
+  </p>
+  <p>
+   由于资源不需要重新验证，因此浏览器不会进行任何网络请求，而是直接从磁盘缓存中获取资源。这明显比 <code>ETag</code> 或 <code>Last-Modified</code> 更快，而且不依赖网络条件。
+  </p>
+  <p>
+    <i>请注意，刷新页面时，浏览器会发送一个 <code>max-age=0</code> 请求头，以强制重新验证。要查看 <code>max-age=N</code> 在本演示中的运行情况，
+      请按 "返回 "按钮，然后按 "下一步 "按钮返回本页。如果 <code>N</code> 秒未过，则应收到 <code>200</code>（来自磁盘缓存）状态。</i>
+  </p>
+  <p>
+    <img
+      width="927"
+      height="281"
+      src="https://blog-1318409910.cos.ap-beijing.myqcloud.com/blog/20231107201619.png"
+      alt="Screenshot of Chrome DevTools showing 200 (from disk cache) status code."
+    />
+  </p>
+  <p>
+    <code>N</code> 秒过后，浏览器将发出网络请求，包括 <code>If-None-Match</code> 或 <code>If-Modified-Since</code> 请求头。
+    这样，您就可以将 <code>max-age=N</code> 与 <code>ETags</code> 或 <code>Last-Modified</code> 结合起来，在性能和新鲜度之间找到平衡。
+  </p>
+  <p>
+    例如，在本演示中，由于数据每 60 秒变化一次，使用 <code>max-age=30</code> 意味着用户最多只能接收 30 秒的过期数据。
+  </p>
+  {{! prettier-ignore }}
+  <p>
+    <details>
+      <summary>View Source Code</summary>
+      <pre><code>const etag = md5(getTime(new Date()));
+
+if (etag === request.headers["if-none-match"]) {
+  reply.statusCode = 304;
+  reply.send();
+} else {
+  reply.headers({
+    "cache-control": "max-age=30",
+    etag,
+  });
+  reply.view("/src/pages/max-age.hbs", params);
+}
+
+return reply;</code></pre>
+    </details>
+  </p>
+  <hr />
+  <details>
+    <summary>Lorem ipsum</summary>
+    {{{data}}}
+  </details>
+</div>

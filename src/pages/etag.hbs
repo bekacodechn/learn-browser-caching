@@ -1,0 +1,74 @@
+<div>
+  <table>
+    <tr>
+      <td>
+        Data:
+      </td>
+      <td>
+        <strong>{{time}}</strong>
+      </td>
+    </tr>
+  </table>
+  <p>
+  此演示利用 <code>ETag</code> 来检查服务器响应的新鲜度。第一次访问此页面时，浏览器没有 <code>ETag</code>，因此会收到服务器的完整响应。该响应包括 <code>etag</code> 标头和该响应的唯一值。在我们的示例中，每 60 秒服务器时间更新一次，etag 就会改变一次。
+  </p>
+<p>
+  <i>请注意，我们还包含了 <code>cache-control: no-cache</code> 响应头。这指示浏览器可以将响应存储在缓存中，但在重新使用之前必须与源服务器检查缓存数据的有效性。</i>
+</p>
+  <p>
+    <img
+      width="927"
+      height="281"
+      src="https://blog-1318409910.cos.ap-beijing.myqcloud.com/blog/20231107200602.png"
+      alt="Screenshot of Chrome DevTools showing response headers, including 'etag: 3ec343...'."
+    />
+  </p>
+  <p>
+    浏览器将存储接收到的 <code>etag</code>，随后的每个请求都将在 <code>If-None-Match</code> 标头中发送 <code>etag</code> 值。
+    如果浏览器发送的 <code>If-None-Match</code> 标头与服务器上生成的 <code>ETag</code> 值相匹配，则服务器将以 <code>304</code> 状态代码做出响应。
+  </p>
+  <p>
+    <img
+      width="938"
+      height="464"
+      src="https://cdn.glitch.global/1d17d497-a0db-4183-b4e9-1a5f350327b1/learn-performance-caching-2-2.png?v=1668007824274"
+      alt="Screenshot of Chrome DevTools showing request headers, including 'if-none-match: 3ec343...'."
+    />
+  </p>
+  <p>
+    响应大小也从 30 多 KB 减少到大约 34 字节，即响应标头的大小。
+  </p>
+  <p>
+    <img
+      width="925"
+      height="43"
+      src="https://blog-1318409910.cos.ap-beijing.myqcloud.com/blog/20231107200755.png"
+      alt="Screenshot of Chrome DevTools showing 304 status code and reduced response size."
+    />
+  </p>
+  {{! prettier-ignore }}
+  <p>
+    <details>
+      <summary>View Source Code</summary>
+      <pre><code>const etag = md5(getTime(new Date()));
+
+if (etag === request.headers["if-none-match"]) {
+  reply.statusCode = 304;
+  reply.send();
+} else {
+  reply.headers({
+    "cache-control": "no-cache",
+    etag,
+  });
+  reply.view("/src/pages/etag.hbs", params);
+}
+
+return reply;</code></pre>
+    </details>
+  </p>
+  <hr />
+  <details>
+    <summary>Lorem ipsum</summary>
+    {{{data}}}
+  </details>
+</div>
